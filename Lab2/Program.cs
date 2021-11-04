@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lab2
 {
@@ -9,8 +10,13 @@ namespace Lab2
         {
 
             //IsBalanced("{ int a = new int[ ] ( ( ) ) }");
+            Console.WriteLine(IsBalanced("{ int a = new int[ ] ( ( ) ) }"));
+            Console.WriteLine(IsBalanced("{ [ ] ) ) ( ( }"));
+            Console.WriteLine(IsBalanced("{[}]"));
 
-            Evaluate("5 3 11 + -");
+            //Evaluate("5 3 11 + -");
+            Console.WriteLine(Evaluate("5 3 11 + -"));
+            Console.WriteLine(Evaluate("15 7 1 1 + - / 3 * 2 1 1 + + -"));
 
         }
 
@@ -31,6 +37,10 @@ namespace Lab2
                 // If closing symbol, then see if it matches the top
                 else if (c == '}' || c == '>' || c == ']' || c == ')')
                 {
+                    if (stack.Count == 0)
+                    {
+                        return false;
+                    }
                     if( Matches(stack.Peek(), c) )
                     {
                         stack.Pop();
@@ -61,9 +71,12 @@ namespace Lab2
 
         private static bool Matches(char open, char close)
         {
-            // do the matching
+            if(open == '(' && close == ')') { return true; }
+            if (open == '{' && close == '}') { return true; }
+            if (open == '[' && close == ']') { return true; }
+            if (open == '<' && close == '>') { return true; }
 
-            return true;
+            return false;
         }
 
         // Evaluate("5 3 11 + -")	// returns -9
@@ -75,7 +88,66 @@ namespace Lab2
 
             string[] tokens = s.Split();
 
+            string[] modifiers = { "+", "-", "*", "/" };
+
             Stack<double> stack = new Stack<double>();
+
+            foreach(string item in tokens)
+            {
+
+                if (item.All(char.IsDigit))
+                {
+                    //Console.WriteLine(int.Parse(item));
+                    stack.Push(int.Parse(item));
+                }
+                if(item == "+")
+                {
+                    if(stack.Count < 2)
+                    {
+                        return null;
+                    }
+                    double number1 = stack.Pop();
+                    double number2 = stack.Pop();
+                    stack.Push(number2 + number1);
+                }
+                if (item == "-")
+                {
+                    if (stack.Count < 2)
+                    {
+                        return null;
+                    }
+                    double number1 = stack.Pop();
+                    double number2 = stack.Pop();
+                    stack.Push(number2 - number1);
+                }
+                if (item == "*")
+                {
+                    if (stack.Count < 2)
+                    {
+                        return null;
+                    }
+                    double number1 = stack.Pop();
+                    double number2 = stack.Pop();
+                    stack.Push(number2 * number1);
+                }
+                if (item == "/")
+                {
+                    if (stack.Count < 2)
+                    {
+                        return null;
+                    }
+                    double number1 = stack.Pop();
+                    double number2 = stack.Pop();
+                    stack.Push(number2 / number1);
+                }
+
+            }
+            if(stack.Count == 0)
+            {
+                return null;
+            }
+            return stack.Peek();
+            
 
             // foreach token
                 // If token is an integer
